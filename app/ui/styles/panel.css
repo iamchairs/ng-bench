@@ -1,0 +1,174 @@
+html, body {
+  height: 100%;
+  margin: 0px;
+  padding: 0px;
+  font-family: Arial, Helvetica;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.ng-hide {
+  display: none;
+}
+
+.clear {
+  clear: both;
+}
+
+img[tooltips] {
+  width: 12px;
+}
+
+#profiles {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  bottom: 0px;
+  width: 200px;
+  background-color: #eeeeee;
+  border-right: 1px solid #888;
+  overflow-y: scroll;
+}
+
+.profile-heading {
+  cursor: default;
+  font-weight: 700;
+  padding: 5px;
+  border-bottom: 1px solid #aaa;
+  background-color: #dddddd;
+}
+
+.profile {
+  cursor: pointer;
+  width: 200px;
+  padding: 10px;
+  font-size: 16px;
+  border-bottom: 1px solid #ccc;
+}
+
+.profile.selected {
+  background-color: #ffffff;
+}
+
+.profile img {
+  width: 24px;
+  height: 24px;
+  vertical-align: middle;
+  margin-right: 5px;
+}
+
+#content {
+  position: absolute;
+  left: 200px;
+  right: 0px;
+  top: 0px;
+  bottom: 0px;
+  overflow-y: scroll;
+}
+
+.profile-back {
+  cursor: pointer;
+  font-weight: 700;
+  padding: 5px;
+  border-bottom: 1px solid #aaa;
+  background-color: #dddddd;
+  width: 100%;
+}
+
+.padded-content {
+  padding: 20px;
+}
+
+.step {
+  clear: both;
+  padding-bottom: 20px;
+}
+
+.file-chooser {
+  min-width: 180px;
+  float: left;
+  padding-right: 20px;
+}
+
+.alert {
+  border-radius: 4px;
+  margin: 10px;
+  padding: 10px; 
+}
+
+.alert-danger {
+  border: 1px solid #c81919;
+  color: #c81919;
+  background-color: #f2c7c7;
+}
+
+.alert-success {
+  border: 1px solid #19c836;
+  color: #19c836;
+  background-color: #e1f4c9;
+}
+
+.expression {
+  color: #018d20;
+}
+
+.function-identifier {
+  color: #77018d;
+}
+
+.function-name {
+  color: #ff8d00;
+}
+
+.function-name.anonymous {
+  text-transform: italic;
+  color: #aaa;
+}
+
+.function-caret img {
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+.function-caret-right {
+  height: 12px;
+}
+
+.function-caret-down {
+  width: 12px;
+}
+
+.code {
+  clear: both;
+  margin: 5px;
+  padding: 5px;
+  border: 1px solid #bbb;
+  background-color: #eee;
+}
+
+.tabs {
+  border-bottom: 1px solid #bbb;
+  width: 100%;
+  margin: 0px;
+  padding: 0px;
+  overflow: auto;
+  list-style-type: none;
+}
+
+.tab {
+  padding: 4px;
+  float: left;
+  margin-right: 2px;
+  border-radius: 3px;
+  background-color: #eee;
+  font-size: 11px;
+  cursor: pointer;
+  border: 1px solid #bbb;
+  border-bottom: 0px;
+}
+
+.tab.active {
+  background-color: #fff;
+}

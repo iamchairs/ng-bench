@@ -1,0 +1,177 @@
+<!doctype html>
+<html ng-app="panel">
+  <head>
+    <meta charset="utf-8">
+    <!-- build:css styles/vendor.css -->
+    <!-- bower:css -->
+    <link rel="stylesheet" href="bower_components/datatables/media/css/jquery.dataTables.css" />
+    <link rel="stylesheet" href="bower_components/angular-datatables/dist/plugins/bootstrap/datatables.bootstrap.css" />
+    <link rel="stylesheet" href="bower_components/angular-tooltips/dist/angular-tooltips.min.css" />
+    <!-- endbower -->
+    <!-- endbuild -->
+    <!-- build:css styles/main.css -->
+    <link href="ui/styles/panel.css" rel="stylesheet">
+    <!-- endbuild -->
+  </head>
+  <body ng-controller="PanelCtrl as vm">
+    <div id="profiles">
+      <div class="profile-heading">
+        Records
+      </div>
+      <div ng-show="vm.$NgBenchPageRecorder.records.length" ng-class="{selected: record === vm.activeRecord}" class="profile" ng-repeat="record in vm.$NgBenchPageRecorder.records" ng-click="vm.setActiveRecord(record)">
+        <img ng-if="record.running" src="images/recording-icon.png" title="Recording"/>
+        <img ng-if="!record.running" src="images/finished-icon.png" title="Complete"/>
+        {{record.name}}
+      </div>
+
+    </div>
+    <div id="content">
+
+      <div class="padded-content" ng-if="!vm.activeRecord">
+        <div class="step">
+          <h2>Proxy Angular:</h2>
+
+          <p>You need to replace your angular.js file with an ngBench injected version. Choose your file on the left and a proxy on the right.</p>
+
+          <div class="file-chooser">
+            <h4>Choose File:</h4>
+            <select ng-options="file.url as file.name for file in vm.files track by file.url" ng-model="vm.file"></select><br/>
+            <pre>{{vm.file}}</pre>
+          </div>
+
+          <div class="file-chooser">
+            <h4>Choose Proxy:</h4>
+            <select ng-options="file.url as file.name for file in vm.proxyFiles track by file.url" ng-model="vm.proxyFile"></select><br/>
+            <pre>{{vm.proxyFile}}</pre>
+          </div>
+
+          <div class="clear"></div>
+
+          <p>Page will need to be reloaded to take affect.</p>
+
+          <button ng-click="vm.proxy()">Proxy</button>
+          <button ng-click="vm.clearProxy()">Clear Proxy</button>
+
+          <h2>Status:</h2>
+
+          <p>If you chose to proxy and everything went according to plan, a proxy should have occured on page load.</p>
+
+          <div ng-if="!vm.proxyLoaded" class="alert alert-danger">No proxy occured on page load.</div>
+          <div ng-if="vm.proxyLoaded" class="alert alert-success">Proxy occured on page load.</div>
+        </div>
+
+        <div ng-if="vm.proxyLoaded" class="step">
+          <h2>Start / Stop Recording:</h2>
+
+          <button ng-if="!vm.isRecording()" ng-click="vm.start()">Start Recording</button>
+          <button ng-if="vm.isRecording()" ng-click="vm.stop()">Stop Recording</button>
+        </div>
+      </div>
+
+      <div ng-if="vm.activeRecord">
+        <div class="profile-back" ng-click="vm.clearActiveRecord()">&laquo; Back</div>
+
+        <div class="padded-content">
+          <h2>{{vm.activeRecord.name}}</h2>
+
+          <div ng-if="vm.activeRecord.running">
+            This record is recording. <button ng-click="vm.stop()">stop</button> recording to view the results.
+          </div>
+
+          <div ng-if="!vm.activeRecord.running">
+
+            <ul class="tabs">
+              <li ng-repeat="(key, value) in ::vm.activeRecord.benches"
+                  ng-click="vm.selectTab(value)"
+                  class="tab"
+                  ng-class="{active: value === vm.selectedTab}">{{::key}} <small>({{::value.totalTime}}ms)</small></li>
+            </ul>
+
+            <div class="tab-pane" ng-repeat="bench in vm.activeRecord.benches" ng-show="bench === vm.selectedTab">
+
+              <pre>Total Recorded Time: {{::bench.totalTime}}</pre>
+            
+              <table datatable="" class="row-border hover">
+                  <thead>
+                    <tr>
+                        <th>
+                          <span>
+                            <img src="images/info-icon.png" tooltips data-title="How many times the expression was evaluated."/>
+                            Calls
+                          </span>
+                        </th>
+                        <th>
+                          <span>
+                            <img src="images/info-icon.png" tooltips data-title="How many unique functions (watch actions) are associated to this expression."/>
+                            fns
+                          </span>
+                        </th>
+                        <th>
+                          <span>
+                            <img src="images/info-icon.png" tooltips data-title="Total time (in milli) this expression used."/>
+                            Total Time
+                          </span>
+                        </th>
+                        <th>
+                          <span>
+                            <img src="images/info-icon.png" tooltips data-title="String expression or function evaluated by a watch."/>
+                            Expression
+                          </span>
+                        </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr ng-repeat="(key, value) in ::bench.expressions">
+                        <td>{{::value.calls}}</td>
+                        <td>{{::value.functionCount}}</td>
+                        <td>{{::value.time}}</td>
+                        <td>
+                          <span ng-if="::value.isFunction" function-display="key"></span>
+                          <span class="expression" ng-if="::!value.isFunction">{{::key}}</span>
+
+                          <div ng-if="::value.functionCount">
+                            <h5>Functions</h5>
+                            <span function-display="function.fn" ng-repeat="function in ::value.functions"></span>
+                          </div>
+
+                        </td>
+                    </tr>
+                  </tbody>
+              </table>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- build:js scripts/vendor.js -->
+    <!-- bower:js -->
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/datatables/media/js/jquery.dataTables.js"></script>
+    <script src="bower_components/angular-datatables/dist/angular-datatables.js"></script>
+    <script src="bower_components/angular-datatables/dist/plugins/bootstrap/angular-datatables.bootstrap.js"></script>
+    <script src="bower_components/angular-datatables/dist/plugins/colreorder/angular-datatables.colreorder.js"></script>
+    <script src="bower_components/angular-datatables/dist/plugins/columnfilter/angular-datatables.columnfilter.js"></script>
+    <script src="bower_components/angular-datatables/dist/plugins/colvis/angular-datatables.colvis.js"></script>
+    <script src="bower_components/angular-datatables/dist/plugins/fixedcolumns/angular-datatables.fixedcolumns.js"></script>
+    <script src="bower_components/angular-datatables/dist/plugins/fixedheader/angular-datatables.fixedheader.js"></script>
+    <script src="bower_components/angular-datatables/dist/plugins/scroller/angular-datatables.scroller.js"></script>
+    <script src="bower_components/angular-datatables/dist/plugins/tabletools/angular-datatables.tabletools.js"></script>
+    <script src="bower_components/angular-tooltips/dist/angular-tooltips.min.js"></script>
+    <!-- endbower -->
+    <!-- endbuild -->
+
+    <!-- build:js scripts/panel.js -->
+    <script src="ui/scripts/panel.module.js"></script>
+    <script src="ui/scripts/constants/panel.proxyFiles.constant.js"></script>
+    <script src="ui/scripts/controllers/panel.controller.js"></script>
+    <script src="ui/scripts/directives/panel.functionDisplay.directive.js"></script>
+    <!-- endbuild -->
+  </body>
+</html>

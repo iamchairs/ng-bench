@@ -1,0 +1,13 @@
+{
+  "name": "ngbench",
+  "version": "0.0.0",
+  "dependencies": {
+    "angular": "~1.4.1",
+    "angular-datatables": "~0.4.3",
+    "angular-tooltips": "~0.1.13"
+  },
+  "devDependencies": {
+    "chai": "~3.0.0",
+    "mocha": "~2.2.5"
+  }
+}

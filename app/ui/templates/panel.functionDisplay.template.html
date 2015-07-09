@@ -1,0 +1,11 @@
+<div class="function-head"></div>
+  <span class="function-identifier">function</span>
+  <span class="function-name" ng-class="{anonymous: isAnonymous}">{{::name}}</span>
+  <span class="function-caret">
+    <img class="function-caret-right" src="images/caretright-icon.png" ng-show="!expanded" ng-click="expand()"/>
+    <img class="function-caret-down" src="images/caretdown-icon.png" ng-show="expanded" ng-click="contract()"/>
+  </span>
+  <pre class="code" ng-show="expanded">
+    {{::functionDisplay}}
+  </pre>
+</div>
