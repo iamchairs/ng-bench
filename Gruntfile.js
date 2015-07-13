@@ -7,6 +7,9 @@
 // use this if you want to recursively match all subfolders:
 // 'test/spec/**/*.js'
 
+var glob = require('glob');
+var fs = require('fs');
+
 module.exports = function (grunt) {
 
   // Load grunt tasks automatically
@@ -329,4 +332,83 @@ module.exports = function (grunt) {
     'test',
     'build'
   ]);
+
+  /** MY STUFF **/
+
+  var proxyFiles = [];
+  var files = fs.readdirSync('app/angular/src/');
+  for(var i = 0; i < files.length; i++) {
+    var file = files[i];
+    if(file !== '.' && file !== '..') {
+      var name = file.replace('.src.js', '');
+      var nameParts = name.split('-');
+      nameParts[0][0] = 'A';
+      name = nameParts[0] + ' ' + nameParts[1] + ' (ngBench)';
+
+      proxyFiles.unshift({
+        name: name,
+        path: 'angular/' + file
+      });
+    }
+  }
+
+  grunt.registerTask('injectProxyFiles', 'injecting proxy files', function() {
+    var done = this.async();
+
+    glob('app/**/*.js', {}, function(er, files) {
+      if(er) {
+        console.error(er);
+      } else {
+        var reg = /(\/\*\s*proxyFiles:start\s*\*\/)(\n|\r|.)*?(\/\*\s*proxyFiles:end\s*\*\/)/gi;
+        var proxyFilesString = '';
+        var proxyFilesStringArr = [];
+        for(var i = 0; i < proxyFiles.length; i++) {
+          var proxyFile = proxyFiles[i];
+          proxyFilesStringArr.push('{name:\'' + proxyFile.name + '\',url:\'' + proxyFile.path + '\'}');
+        }
+
+        proxyFilesString = proxyFilesStringArr.join(',');
+
+        for(var i = 0; i < files.length; i++) {
+          var file = files[i];
+          var fileContents = fs.readFileSync(file, {encoding: 'UTF8'});
+          fileContents = fileContents.replace(reg, '$1' + proxyFilesString + '$3')
+          fs.writeFileSync(file, fileContents);
+        }
+
+        done();
+      }
+    })
+  });
+
+  grunt.registerTask('injectManifest', 'injecting manifest', function() {
+    var done = this.async();
+
+    glob('app/manifest.json', {}, function(er, files) {
+      if(er) {
+        console.error(er);
+      } else {
+        var reg = /("web_accessible_resources":\s*\[)(\n|\r|.)*?(\],)/gi;
+        var proxyFilesString = '';
+        var proxyFilesStringArr = [];
+        for(var i = 0; i < proxyFiles.length; i++) {
+          var proxyFile = proxyFiles[i];
+          proxyFilesStringArr.push('"' + proxyFile.path + '"');
+        }
+
+        proxyFilesString = proxyFilesStringArr.join(',\n');
+
+        for(var i = 0; i < files.length; i++) {
+          var file = files[i];
+          var fileContents = fs.readFileSync(file, {encoding: 'UTF8'});
+          fileContents = fileContents.replace(reg, '$1' + proxyFilesString + '$3')
+          fs.writeFileSync(file, fileContents);
+        }
+
+        done();
+      }
+    })
+  });
+
+  grunt.registerTask('angular', ['injectProxyFiles', 'injectManifest']);
 };

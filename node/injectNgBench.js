@@ -110,6 +110,8 @@ var genericInjectPoints = [
 ];
 
 _.each(files, function(file) {
+  console.log('injecting ' + file);
+  
   var source = fs.readFileSync('../app/angular/src/' + file, {encoding: 'utf8'});
   var benchClass = fs.readFileSync('templates/bench.class.tpl.js', {encoding: 'utf8'});
   var injectedFile = benchClass + '\n' + source;

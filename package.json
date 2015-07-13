@@ -2,6 +2,8 @@
   "name": "ngbench",
   "version": "0.0.0",
   "dependencies": {
+    "glob": "^5.0.13",
+    "grunt-wiredep": "^2.0.0",
     "lodash": "^3.10.0"
   },
   "devDependencies": {
