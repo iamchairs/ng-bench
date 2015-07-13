@@ -12,6 +12,11 @@ module.exports = {
 function pullMethod(str, method) {
 
   var start = str.indexOf(method);
+  
+  if(start === -1) {
+    return null;
+  }
+
   var end = -1;
   var cont = true;
   var methodOpened = false;

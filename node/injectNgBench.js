@@ -9,7 +9,7 @@ var files = fs.readdirSync('../app/angular/src');
 
 var genericInjectPoints = [
   {
-    indexOf: 'if (watch) {',
+    indexOf: 'if (watch',
     benchName: 'watch',
     description: 'Benchmark for watch expressions and functions.',
     expressionVar: 'watch.exp',
@@ -111,13 +111,20 @@ var genericInjectPoints = [
 
 _.each(files, function(file) {
   console.log('injecting ' + file);
-  
+
   var source = fs.readFileSync('../app/angular/src/' + file, {encoding: 'utf8'});
   var benchClass = fs.readFileSync('templates/bench.class.tpl.js', {encoding: 'utf8'});
   var injectedFile = benchClass + '\n' + source;
+  var res = null;
 
   _.each(genericInjectPoints, function(genericInjectPoint) {
-    injectedFile = executeStrategy(genericInjectPoint.strategy, injectedFile, genericInjectPoint);
+    res = executeStrategy(genericInjectPoint.strategy, injectedFile, genericInjectPoint);
+
+    if(!res) {
+      console.error('strategy failed \'' + genericInjectPoint.strategy + '\' on ' + genericInjectPoint.benchName + ' -> ' + file);
+    } else {
+      injectedFile = res;
+    }
   });
 
   fs.writeFileSync('../app/angular/' + file.replace('.src', ''), injectedFile);

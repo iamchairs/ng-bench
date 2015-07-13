@@ -1,6 +1,17 @@
+function $NgBenchFunction(fn) {
+  this.time = 0;
+  this.calls = 0;
+  this.fn = fn;
+}
 
-var startTime = new Date().getTime();
-;
+function $NgBenchExpression(exp) {
+  this.time = 0;
+  this.calls = 0;
+  this.exp = exp;
+  this.isFunction = typeof exp === 'function';
+  this.functionCount = 0;
+  this.functions = {};
+}
 
 function $NgBench(name) {
   var self = this;
@@ -11655,6 +11666,8 @@ function $RootScopeProvider(){
                           ? equals(value, last)
                           : (typeof value == 'number' && typeof last == 'number'
                              && isNaN(value) && isNaN(last)))) {
+var startTime = new Date().getTime();
+
                     dirty = true;
                     watch.last = watch.eq ? copy(value) : value;
                     watch.fn(value, ((last === initWatchVal) ? value : last), current);
@@ -11667,7 +11680,14 @@ function $RootScopeProvider(){
                       logMsg += '; newVal: ' + toJson(value) + '; oldVal: ' + toJson(last);
                       watchLog[logIdx].push(logMsg);
                     }
-                  }
+                  
+var endTime = new Date().getTime();
+var diff = endTime - startTime;
+var bench = $NgBenchPageRecorder.getActiveRecord().bench('watch');
+bench.addTime(diff);
+bench.benchExpression(watch.exp, diff);
+bench.recordExpressionFunction(watch.exp, watch.fn, diff);
+}
                 } catch (e) {
                   $exceptionHandler(e);
                 }

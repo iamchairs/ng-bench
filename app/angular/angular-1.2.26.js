@@ -1,7 +1,8 @@
-
-var startTime = new Date().getTime();
-
-
+function $NgBenchFunction(fn) {
+  this.time = 0;
+  this.calls = 0;
+  this.fn = fn;
+}
 
 function $NgBenchExpression(exp) {
   this.time = 0;

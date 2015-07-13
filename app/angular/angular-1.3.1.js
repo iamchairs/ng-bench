@@ -13788,13 +13788,22 @@ function $RootScopeProvider() {
         }
 
         if (watchExpressions.length === 1) {
+var startTime = new Date().getTime();
+
           // Special case size of one
           return this.$watch(watchExpressions[0], function watchGroupAction(value, oldValue, scope) {
             newValues[0] = value;
             oldValues[0] = oldValue;
             listener(newValues, (value === oldValue) ? newValues : oldValues, scope);
           });
-        }
+        
+var endTime = new Date().getTime();
+var diff = endTime - startTime;
+var bench = $NgBenchPageRecorder.getActiveRecord().bench('watch');
+bench.addTime(diff);
+bench.benchExpression(watch.exp, diff);
+bench.recordExpressionFunction(watch.exp, watch.fn, diff);
+}
 
         forEach(watchExpressions, function(expr, i) {
           var unwatchFn = self.$watch(expr, function watchGroupSubAction(value, oldValue) {
@@ -14109,8 +14118,6 @@ function $RootScopeProvider() {
                   // Most common watches are on primitives, in which case we can short
                   // circuit it with === operator, only when === fails do we use .equals
                   if (watch) {
-var startTime = new Date().getTime();
-
                     if ((value = watch.get(current)) !== (last = watch.last) &&
                         !(watch.eq
                             ? equals(value, last)
@@ -14133,23 +14140,9 @@ var startTime = new Date().getTime();
                       // If the most recently dirty watcher is now clean, short circuit since the remaining watchers
                       // have already been tested.
                       dirty = false;
-
-var endTime = new Date().getTime();
-var diff = endTime - startTime;
-var bench = $NgBenchPageRecorder.getActiveRecord().bench('watch');
-bench.addTime(diff);
-bench.benchExpression(watch.exp, diff);
-bench.recordExpressionFunction(watch.exp, watch.fn, diff);
                       break traverseScopesLoop;
                     }
-                  
-var endTime = new Date().getTime();
-var diff = endTime - startTime;
-var bench = $NgBenchPageRecorder.getActiveRecord().bench('watch');
-bench.addTime(diff);
-bench.benchExpression(watch.exp, diff);
-bench.recordExpressionFunction(watch.exp, watch.fn, diff);
-}
+                  }
                 } catch (e) {
                   $exceptionHandler(e);
                 }

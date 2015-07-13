@@ -6,6 +6,11 @@ module.exports = strategy;
 
 function strategy (injectedFile, genericInjectPoint) {
   var pullData = util.pullMethod(injectedFile, genericInjectPoint.indexOf);
+  
+  if(!pullData) {
+    return null;
+  }
+
   var injectedMethod = injectMethod(genericInjectPoint.benchName, genericInjectPoint.expressionVar, pullData.method);
   return pullData.firstHalf + injectedMethod + pullData.lastHalf;
 }
