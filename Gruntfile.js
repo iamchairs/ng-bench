@@ -238,14 +238,15 @@ module.exports = function (grunt) {
           cwd: '<%= config.app %>',
           dest: '<%= config.dist %>',
           src: [
-            'angular/**/*',
             '*.{ico,png,txt}',
             'images/{,*/}*.{webp,gif}',
             '{,*/}*.html',
             'styles/{,*/}*.css',
             'styles/fonts/{,*/}*.*',
             '_locales/{,*/}*.json',
-            'ui/templates/**/*.html'
+            'angular/*.js',
+            'scripts/devtools.js',
+            'ui/**/*'
           ]
         }]
       }
@@ -315,11 +316,12 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('build', [
+    'angular',
     'clean:dist',
     'chromeManifest:dist',
     'useminPrepare',
     'concurrent:dist',
-    'cssmin',
+    /*'cssmin',*/
     'concat',
     'uglify',
     'copy',
@@ -347,7 +349,7 @@ module.exports = function (grunt) {
 
       proxyFiles.unshift({
         name: name,
-        path: 'angular/' + file
+        path: 'angular/' + file.replace('.src', '')
       });
     }
   }

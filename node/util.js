@@ -2,6 +2,12 @@ module.exports = {
   pullMethod: pullMethod
 };
 
+String.prototype.regexIndexOf = function(regex, startpos) {
+  var indexOf = this.substring(startpos || 0).search(regex);
+  return (indexOf >= 0) ? (indexOf + (startpos || 0)) : indexOf;
+}
+
+
 /**
  *
  * returns object
@@ -11,7 +17,12 @@ module.exports = {
  */
 function pullMethod(str, method) {
 
-  var start = str.indexOf(method);
+  var start = -1;
+  if(typeof method === 'string') {
+    start = str.indexOf(method);
+  } else {
+    start = str.regexIndexOf(method);
+  }
   
   if(start === -1) {
     return null;

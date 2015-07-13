@@ -9,7 +9,7 @@ var files = fs.readdirSync('../app/angular/src');
 
 var genericInjectPoints = [
   {
-    indexOf: 'if (watch',
+    indexOf: /if \(watch[^E](\w|\W)*(\))/,
     benchName: 'watch',
     description: 'Benchmark for watch expressions and functions.',
     expressionVar: 'watch.exp',
