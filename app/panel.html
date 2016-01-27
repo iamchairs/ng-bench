@@ -56,11 +56,13 @@
 
           <p>If you chose to proxy and everything went according to plan, a proxy should have occured on page load.</p>
 
-          <div ng-if="!vm.proxyLoaded" class="alert alert-danger">No proxy occured on page load.</div>
-          <div ng-if="vm.proxyLoaded" class="alert alert-success">Proxy occured on page load.</div>
+          <div ng-if="!vm.proxyLoaded" class="alert alert-danger">No Proxy Occured.</div>
+          <div ng-if="vm.proxyLoaded" class="alert alert-success">Proxy Occured!</div>
+          <div ng-if="!vm.$NgBenchPageRecorder" class="alert alert-danger">NgBench Not Found.</div>
+          <div ng-if="vm.$NgBenchPageRecorder" class="alert alert-success">NgBench Found!</div>
         </div>
 
-        <div ng-if="vm.proxyLoaded" class="step">
+        <div ng-if="vm.proxyLoaded && vm.$NgBenchPageRecorder" class="step">
           <h2>Start / Stop Recording:</h2>
 
           <button ng-if="!vm.isRecording()" ng-click="vm.start()">Start Recording</button>

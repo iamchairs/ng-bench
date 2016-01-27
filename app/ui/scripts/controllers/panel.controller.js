@@ -17,30 +17,31 @@
     this.start = start;
     this.stop = stop;
     this.isRecording = isRecording;
+    this.reloadResources = reloadResources;
     this.proxyLoaded = false;
 
     this.selectedTab = null;
     this.selectTab = selectTab;
 
-    chrome.devtools.network.onNavigated.addListener(function() {
-      /**
-       * I hate it, but it looks like we need to wait for chrome to refresh it's resources
-       */
-      setTimeout(function() {
-        reload();
-      }, 1000);
+    onMessage(function(request) {
+      if(request.message === 'PROXY_MADE') {
+        initProxy();
+      }
     });
 
-    reload();
+    chrome.devtools.inspectedWindow.onResourceAdded.addListener(function() {
+      vm.reloadResources();
+    });
+
+    reloadResources();
+    initProxy();
 
     function initProxy() {
-      var defer = $q.defer();
-
       chrome.storage.sync.get('ngBenchProxy', function(data) {
-        var ngBenchProxy = data.ngBenchProxy;
+        var ngBenchProxy = this.ngBenchProxy = data.ngBenchProxy;
 
         if(!ngBenchProxy) {
-          ngBenchProxy = {};
+          ngBenchProxy = this.ngBenchProxy = {};
         }
 
         chrome.devtools.inspectedWindow.eval('window.location.hostname', function(hostname) {
@@ -54,27 +55,30 @@
             vm.proxyFile = ngBenchProxy[hostname].proxy;
           }
 
-          defer.resolve();
+          if(vm.proxyLoaded) {
+            reloadNgBenchPageRecorder();
+          } else {
+            $scope.$apply();
+          }
         });
       });
-
-      return defer.promise;
     }
 
     function reloadNgBenchPageRecorder () {
-      var defer = $q.defer();
-
       chrome.devtools.inspectedWindow.eval('$NgBenchPageRecorder', function($NgBenchPageRecorder) {
-        vm.$NgBenchPageRecorder = $NgBenchPageRecorder;
-
-        if(vm.activeRecord) {
-          reloadActiveRecord();
+        if(vm.$NgBenchPageRecorder !== $NgBenchPageRecorder) {
+          vm.$NgBenchPageRecorder = $NgBenchPageRecorder;
+          $scope.$apply();
         }
-        
-        defer.resolve();
-      });
 
-      return defer.promise;
+        if($NgBenchPageRecorder) {
+          if(vm.activeRecord) {
+            reloadActiveRecord();
+          }
+        } else {
+          setTimeout(reloadNgBenchPageRecorder, 1000);
+        }
+      });
     }
 
     function reloadActiveRecord () {
@@ -107,8 +111,6 @@
     }
 
     function reloadResources() {
-      var defer = $q.defer();
-
       chrome.devtools.inspectedWindow.getResources(function(resources) {
         vm.files.length = 0;
         for(var i = 0; i < resources.length; i++) {
@@ -140,16 +142,8 @@
           }
         }
 
-        if(!proxyFound) {
-          clearProxy(true).then(function() {
-            defer.resolve();
-          });
-        } else {
-          defer.resolve();
-        }
+        $scope.$apply();
       });
-      
-      return defer.promise;
     }
 
     function setActiveRecord (record) {
@@ -163,7 +157,6 @@
     }
 
     function proxy(silent) {
-      var defer = $q.defer();
 
       var originalFile = null;
 
@@ -192,28 +185,19 @@
             };
 
             chrome.storage.sync.set({ngBenchProxy: ngBenchProxy}, function() {
-              chrome.runtime.sendMessage({message: 'PROXY_UPDATE'});
-
-              if(!silent) {
-                alert('Reload page to begin.');
-              }
-
-              defer.resolve();
+              sendMessage({message: 'PROXY_UPDATE'});
+              chrome.devtools.inspectedWindow.reload(true);
             });
 
           });
         });
       } else {
         alert('could not find file: ' + vm.file);
-        defer.reject();
       }
 
-      return defer;
     }
 
     function clearProxy(silent) {
-      var defer = $q.defer();
-
       chrome.storage.sync.get('ngBenchProxy', function(data) {
         var ngBenchProxy = data.ngBenchProxy;
 
@@ -225,19 +209,12 @@
           delete ngBenchProxy[hostname];
 
           chrome.storage.sync.set({ngBenchProxy: ngBenchProxy}, function() {
-            if(!silent) {
-              alert('Proxy cleared. Reload page to return to normal.');
-            }
-
-            chrome.runtime.sendMessage({message: 'PROXY_UPDATE'});
-
-            defer.resolve();
+            sendMessage({message: 'PROXY_UPDATE'});
+            chrome.devtools.inspectedWindow.reload(true);
           });
 
         });
       });
-
-      return defer.promise;
     }
 
     function start() {
@@ -272,12 +249,6 @@
       vm.selectedTab = tab;
     }
 
-    function reload () {
-      return reloadResources()
-        .then(initProxy)
-        .then(reloadNgBenchPageRecorder)
-        .then($scope.apply);
-    }
   }
 
   PanelCtrl.$inject = ['$scope', '$q', 'proxyFiles'];
@@ -286,3 +257,16 @@
     .controller('PanelCtrl', PanelCtrl);
 
 })();
+
+// Joys of chrome extension dev
+var messageHandlers = [];
+
+function onMessage(fn) {
+  messageHandlers.push(fn); 
+}
+
+function propogateMessage(msg) {
+  for(var i = 0; i < messageHandlers.length; i++) {
+    messageHandlers[i](msg);
+  }
+}

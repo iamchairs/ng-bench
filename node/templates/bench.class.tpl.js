@@ -133,4 +133,4 @@ function $NgBenchRecorder () {
   }
 }
 
-var $NgBenchPageRecorder = new $NgBenchRecorder();
+var $NgBenchPageRecorder = window.top.$NgBenchPageRecorder = new $NgBenchRecorder();

@@ -133,7 +133,7 @@ function $NgBenchRecorder () {
   }
 }
 
-var $NgBenchPageRecorder = new $NgBenchRecorder();
+var $NgBenchPageRecorder = window.top.$NgBenchPageRecorder = new $NgBenchRecorder();
 /**
  * @license AngularJS v1.2.10
  * (c) 2010-2014 Google, Inc. http://angularjs.org

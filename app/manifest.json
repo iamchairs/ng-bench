@@ -1,6 +1,6 @@
 {
   "name": "__MSG_appName__",
-  "version": "0.1.12",
+  "version": "0.1.18",
   "manifest_version": 2,
   "description": "__MSG_appDescription__",
   "icons": {
@@ -15,6 +15,13 @@
     ]
   },
   "web_accessible_resources": [
+    "angular/angular-1.4.9.js",
+    "angular/angular-1.4.8.js",
+    "angular/angular-1.4.7.js",
+    "angular/angular-1.4.6.js",
+    "angular/angular-1.4.5.js",
+    "angular/angular-1.4.4.js",
+    "angular/angular-1.4.3.js",
     "angular/angular-1.4.2.js",
     "angular/angular-1.4.1.js",
     "angular/angular-1.4.0.js",

@@ -133,7 +133,7 @@ function $NgBenchRecorder () {
   }
 }
 
-var $NgBenchPageRecorder = new $NgBenchRecorder();
+var $NgBenchPageRecorder = window.top.$NgBenchPageRecorder = new $NgBenchRecorder();
 /**
  * @license AngularJS v1.3.2
  * (c) 2010-2014 Google, Inc. http://angularjs.org
@@ -12633,7 +12633,7 @@ var startTime = new Date().getTime();
             cache[cacheKey] = parsedExpression;
           }
 
-var $retVal = addInterceptor(parsedExpression, interceptorFn);
+var $retVal = addInterceptor(parsedExpression, interceptorFn);
 
 var endTime = new Date().getTime();
 var diff = endTime - startTime;
@@ -12646,7 +12646,7 @@ return $retVal
 
         case 'function':
 
-var $retVal = addInterceptor(exp, interceptorFn);
+var $retVal = addInterceptor(exp, interceptorFn);
 
 var endTime = new Date().getTime();
 var diff = endTime - startTime;
@@ -12659,7 +12659,7 @@ return $retVal
 
         default:
 
-var $retVal = addInterceptor(noop, interceptorFn);
+var $retVal = addInterceptor(noop, interceptorFn);
 
 var endTime = new Date().getTime();
 var diff = endTime - startTime;
